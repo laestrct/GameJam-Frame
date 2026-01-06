@@ -1,13 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Tracing;
+using System;
 using UnityEngine;
-
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 核心流程控制器
+/// 游戏状态整体由状态机驱动
 /// </summary>
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -27,59 +23,49 @@ public class GameManager : MonoSingleton<GameManager>
 
         if (currentState != null)
         {
-            // 打印日志方便调试流程
             Debug.Log($"[GameManager] 进入状态: {currentState.GetType().Name}");
             currentState.OnEnter();
         }
     }
 
-    private void Update()
-    {
-        // 将Update驱动权下放给当前状态
-        currentState?.OnUpdate();
-    }
+
 
     #endregion
 
-    #region Global Data
-
+    #region 快速引用
     // 玩家引用
-    [HideInInspector] public GameObject Player;
-
-    // 游戏数据
-    public GameData GameData = new();
+    [HideInInspector] public GameObject Player { get; private set; }
 
     #endregion
 
     #region 生命周期
 
-    protected void Awake()
+    public void Awake()
     {
         DontDestroyOnLoad(gameObject);
         // 初始化时进入菜单状态
         ChangeState(new MenuState(this));
     }
-
-    #endregion
-
-    #region 辅助方法
-
-    public void AddScore(int amount)
+    public void Update()
     {
-        GameData.Score += amount;
-        EventManager.Broadcast(GameEvent.PlayerScore, GameData.Score);
+        // 将Update驱动权下放给当前状态
+        currentState?.OnUpdate();
     }
 
-    public void ResetGameData()
-    {
-        GameData.Score = 0;
-        GameData.IsGameOver = false;
-        Time.timeScale = 1f;
-    }
+    #endregion 
+
+    #region API实现
+    //此处为示例方法，可根据需要自行添加
+    //全局辅助方法应在此处添加
 
     public void RegisterPlayer(GameObject player)
     {
         this.Player = player;
+    }
+
+    public void UnregisterPlayer()
+    {
+        this.Player = null;
     }
 
     #endregion

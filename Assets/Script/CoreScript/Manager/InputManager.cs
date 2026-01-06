@@ -3,6 +3,14 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
+/// <summary>
+/// 该脚本属于拓展功能，并非必须组件
+/// 主要用处为在需要时锁定玩家输入，避免玩家操作
+/// 并在需要时给UI提供键位映射支持和键位修改功能
+/// 
+/// 就算不使用其功能，仍然需要将该脚本挂载在场景中以避免报错
+/// </summary>
+
 public enum InputLockLevel
 {
     None = 0,
@@ -13,6 +21,8 @@ public enum InputLockLevel
 
 public class InputManager : MonoSingleton<InputManager>
 {
+    //键盘键位映射表
+    //若要增加键位，请记得在下方输入查询 API位置增加对应的bool查询方法
     [Header("Key Bindings (Keyboard)")]
     public KeyCode interactKey = KeyCode.E;
     public KeyCode spyKey = KeyCode.F;
@@ -42,39 +52,7 @@ public class InputManager : MonoSingleton<InputManager>
         BuildKeyCache();
     }
 
-    /// <summary>
-    /// 利用反射自动构建 "动作名" 到 "按键字符" 的映射
-    /// </summary>
-    private void BuildKeyCache()
-    {
-        keyDisplayCache.Clear();
 
-        keyDisplayCache["Move"] = "WASD";
-        keyDisplayCache["Esc"] = "ESC";
-
-        FieldInfo[] fields = this.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
-
-        foreach (var field in fields)
-        {
-            if (field.FieldType == typeof(KeyCode) && field.Name.EndsWith("Key"))
-            {
-                string rawName = field.Name.Substring(0, field.Name.Length - 3);
-                // 2. 首字母大写 (interact -> Interact) 以匹配标签 [Interact]
-                string actionName = char.ToUpper(rawName[0]) + rawName.Substring(1);
-
-                // 获取当前按键的值
-                KeyCode code = (KeyCode) field.GetValue(this);
-
-                // 存入缓存: Key="Interact", Value="[E]"
-                if (!keyDisplayCache.ContainsKey(actionName))
-                {
-                    keyDisplayCache.Add(actionName, $"[{code.ToString()}]");
-                }
-            }
-        }
-
-        // foreach(var kv in keyDisplayCache) Debug.Log($"Loaded: [{kv.Key}] => {kv.Value}");
-    }
 
     #region 锁定控制 API
 
@@ -102,8 +80,7 @@ public class InputManager : MonoSingleton<InputManager>
     #region 核心输入查询 API
 
     // --- 移动类 ---
-    // 为了手感顺滑，移动依然建议保留 GetAxisRaw，这样利用了 Unity 默认的 Input Manager (WASD/Arrows)
-    // 同时也支持 GetKey
+    //注：此处的LockMove意为“是否锁定移动输入”，而非“是否允许移动”
 
     public float GetMoveX()
     {
@@ -132,7 +109,6 @@ public class InputManager : MonoSingleton<InputManager>
     public bool WalkBack()
     {
         if (LockMove) return false;
-        // 假设后退是 S 键或下方向键
         return Input.GetAxisRaw("Vertical") < -0.1f;
     }
 
@@ -141,7 +117,6 @@ public class InputManager : MonoSingleton<InputManager>
         if (LockMove) return false;
         return Input.GetKey(runKey);
     }
-
     // --- 楼层/交互类 ---
 
     public bool UpStair()
@@ -191,13 +166,45 @@ public class InputManager : MonoSingleton<InputManager>
 
     public bool Esc()
     {
-        // 永不锁定
+        //通常情况下我们不进行ESC的锁定
         return Input.GetKeyDown(pauseKey);
     }
 
     #endregion
 
-    #region UI 显示支持 (GetInputDisplay)
+    #region UI 显示支持
+
+    /// <summary>
+    /// 利用反射自动构建 "动作名" 到 "按键字符" 的映射
+    /// </summary>
+    private void BuildKeyCache()
+    {
+        keyDisplayCache.Clear();
+
+        keyDisplayCache["Move"] = "WASD";
+        keyDisplayCache["Esc"] = "ESC";
+
+        FieldInfo[] fields = this.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (var field in fields)
+        {
+            if (field.FieldType == typeof(KeyCode) && field.Name.EndsWith("Key"))
+            {
+                string rawName = field.Name.Substring(0, field.Name.Length - 3);
+                string actionName = char.ToUpper(rawName[0]) + rawName.Substring(1);
+
+                // 获取当前按键的值
+                KeyCode code = (KeyCode) field.GetValue(this);
+
+                if (!keyDisplayCache.ContainsKey(actionName))
+                {
+                    keyDisplayCache.Add(actionName, $"[{code.ToString()}]");
+                }
+            }
+        }
+
+        // foreach(var kv in keyDisplayCache) Debug.Log($"Loaded: [{kv.Key}] => {kv.Value}");
+    }
 
     /// <summary>
     /// 获取按键提示字符
@@ -208,7 +215,7 @@ public class InputManager : MonoSingleton<InputManager>
         {
             return keyDisplayCache[actionName];
         }
-        // 如果找不到映射，原样返回，方便排查错误
+        // 如果找不到映射，原样返回
         return $"[{actionName}?]";
     }
 
