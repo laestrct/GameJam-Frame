@@ -123,16 +123,16 @@ public override void OnEnter()
     * **动态缩放**：支持平滑缩放 (`ZoomTo`) 和 **冲击变焦** (`ZoomPunch`，增加打击感)。
 
 ```csharp
-// 1. 跟随玩家 (瞬间)
+// 跟随玩家 (瞬间)
 CameraManager.Instance.Follow(playerTransform, true);
 
-// 2. 剧情演出：看一眼门口，2秒后自动看回玩家
+// 剧情演出：看一眼门口，2秒后自动看回玩家
 CameraManager.Instance.FocusOn(doorTransform, 2.0f);
 
-// 3. 震动：播放 Inspector 中配置好的 "Explosion" 预设
+// 震动：播放 Inspector 中配置好的 "Explosion" 预设
 CameraManager.Instance.Shake("Explosion");
 
-// 4. 打击感：攻击命中时，瞬间推拉镜头 (Zoom Punch)
+// 打击感：攻击命中时，瞬间推拉镜头 (Zoom Punch)
 CameraManager.Instance.ZoomPunch();
 ```
 

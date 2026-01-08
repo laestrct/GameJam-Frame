@@ -35,4 +35,9 @@ public abstract class UIBase : MonoBehaviour
         childBindTool ??= new(this, this.transform);
         return childBindTool.Get<T>(name);
     }
+
+    private void Close()
+    {
+        UIManager.Instance.CloseUI(this);
+    }
 }
