@@ -6,7 +6,7 @@
 ## 🛠️ 核心模块
 
 ### 1. Audio Manager (音频管理)
-支持 **自动对象池**、**防爆音**、**BGM 平滑过渡 (CrossFade)**。
+支持 **自动对象池**、**防爆音**、**BGM 平滑过渡**。
 
 * **特性**：
     * **自动缓存**：自动管理已加载的 AudioClip。
@@ -72,7 +72,7 @@ string tip = InputManager.Instance.ParseInputString("请按 [Interact] 进行互
 ```
 
 ### 4. Event Center (事件中心)
-基于 `Enum` 的静态即时消息中心，彻底 **解耦** Gameplay 与 UI/Audio。
+基于 `Enum` 的静态即时消息中心，**解耦** Gameplay 与 UI/Audio。
 
 * **特性**：
     * **类型安全**：强制使用 `GameEvent` 枚举，彻底避免字符串拼写错误。
@@ -80,21 +80,21 @@ string tip = InputManager.Instance.ParseInputString("请按 [Interact] 进行互
     * **泛型支持**：支持无参、1参、2参传递。
 
 ```csharp
-// 1. 定义事件
+// 定义事件
 public enum GameEvent { PlayerDead, ScoreChange }
 
-// 2. 发送事件
+// 发送事件
 EventCenter.Broadcast(GameEvent.ScoreChange, 100);
 
-// 3. 监听事件
+// 监听事件
 EventCenter.AddListener<int>(GameEvent.ScoreChange, OnScoreChange);
 
-// 4. 移除监听 (有监听务必移除监听)
+// 移除监听 (有监听务必移除监听)
 EventCenter.RemoveListener<int>(GameEvent.ScoreChange, OnScoreChange);
 ```
 
 ### 5. Game Manager (状态机)
-基于继承式 **FSM (Finite State Machine)** 管理游戏流程，避免 God Class。
+基于继承式 **FSM (Finite State Machine)** 管理游戏流程
 
 * **结构**：
     * **MenuState**: 处理主菜单逻辑。
@@ -134,6 +134,39 @@ CameraManager.Instance.Shake("Explosion");
 
 // 4. 打击感：攻击命中时，瞬间推拉镜头 (Zoom Punch)
 CameraManager.Instance.ZoomPunch();
+```
+
+### 7. Timer Manager (计时器系统)
+基于 **对象池** 与 **静态 API** 的计时器系统，解决 Coroutine 难以管理和 Invoke 传参受限的问题。
+
+* **特性**：
+    * **静态调用**：`Timer.Register` 无需持有引用，静态调用。
+    * **零 GC**：内部实现完善的对象池，允许高频使用（如子弹生命周期）。
+    * **丰富控制**：支持暂停、恢复、循环、真实时间(不受TimeScale影响)、Tag 批量取消。
+
+```csharp
+// 简单的延时回调 (3秒后执行)
+Timer.Register(3f, () => {
+    Debug.Log("3秒已到");
+});
+
+// 带有进度更新的计时器 (常用于 UI 进度条或技能蓄力)
+Timer.Register(2f, 
+    onComplete: () => Debug.Log("蓄力完成"),
+    onUpdate: (percent) => {
+        // percent 为 0~1 的浮点数
+        progressBar.fillAmount = percent; 
+    });
+
+// 循环计时器与手动控制
+var timer = Timer.Register(1f, () => Debug.Log("滴答"), isLooped: true);
+// 手动暂停/恢复/取消
+timer.Pause();
+timer.Cancel();
+
+// 批量管理 (例如：场景切换时清理特定 Tag)
+Timer.Register(5f, () => {}, isLooped: true).SetTag("Level1");
+Timer.CancelAll("Level1");
 ```
 ---
 
