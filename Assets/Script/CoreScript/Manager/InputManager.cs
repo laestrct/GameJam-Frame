@@ -23,16 +23,17 @@ public class InputManager : MonoSingleton<InputManager>
 {
     //键盘键位映射表
     //若要增加键位，请记得在下方输入查询 API位置增加对应的bool查询方法
+    //在inspector中修改键位的对应关系
     [Header("Key Bindings (Keyboard)")]
-    public KeyCode interactKey = KeyCode.E;
-    public KeyCode spyKey = KeyCode.F;
-    public KeyCode lightKey = KeyCode.Q;
-    public KeyCode mapKey = KeyCode.M;
-    public KeyCode ruleKey = KeyCode.Tab;
-    public KeyCode runKey = KeyCode.LeftShift;
-    public KeyCode upStairKey = KeyCode.W;
-    public KeyCode downStairKey = KeyCode.S;
-    public KeyCode pauseKey = KeyCode.Escape;
+    public KeyCode InteractKey = KeyCode.E;
+    public KeyCode FKey = KeyCode.F;
+    public KeyCode QKey = KeyCode.Q;
+    public KeyCode MapKey = KeyCode.M;
+    public KeyCode TabKey = KeyCode.Tab;
+    public KeyCode RunKey = KeyCode.LeftShift;
+    public KeyCode UpKey = KeyCode.UpArrow;
+    public KeyCode DownKey = KeyCode.DownArrow;
+    public KeyCode PauseKey = KeyCode.Escape;
 
 
     private Dictionary<string, string> keyDisplayCache = new ();//键位映射表
@@ -115,59 +116,59 @@ public class InputManager : MonoSingleton<InputManager>
     public bool Run()
     {
         if (LockMove) return false;
-        return Input.GetKey(runKey);
+        return Input.GetKey(RunKey);
     }
     // --- 楼层/交互类 ---
 
-    public bool UpStair()
+    public bool Up()
     {
         if (LockMove) return false;
-        return Input.GetKeyDown(upStairKey);
+        return Input.GetKeyDown(UpKey);
     }
 
-    public bool DownStair()
+    public bool Down()
     {
         if (LockMove) return false;
-        return Input.GetKeyDown(downStairKey);
+        return Input.GetKeyDown(DownKey);
     }
 
     public bool Interact()
     {
         if (LockInteract) return false;
         // 允许 E 键 
-        return Input.GetKeyDown(interactKey);
+        return Input.GetKeyDown(InteractKey);
     }
 
     // --- 功能类 ---
 
-    public bool Spy()
+    public bool F()
     {
         if (LockMove) return false;
-        return Input.GetKeyDown(spyKey);
+        return Input.GetKeyDown(FKey);
     }
 
-    public bool Light()
+    public bool Q()
     {
         if (LockMove) return false;
-        return Input.GetKeyDown(lightKey);
+        return Input.GetKeyDown(QKey);
     }
 
     public bool Map()
     {
         if (LockAll) return false;
-        return Input.GetKeyDown(mapKey);
+        return Input.GetKeyDown(MapKey);
     }
 
-    public bool Rule()
+    public bool Tab()
     {
         if (LockAll) return false;
-        return Input.GetKeyDown(ruleKey);
+        return Input.GetKeyDown(TabKey);
     }
 
     public bool Esc()
     {
-        //通常情况下我们不进行ESC的锁定
-        return Input.GetKeyDown(pauseKey);
+        //通常情况下不进行ESC的锁定
+        return Input.GetKeyDown(PauseKey);
     }
 
     #endregion

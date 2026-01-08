@@ -251,6 +251,8 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420034}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -363,6 +365,36 @@ MonoBehaviour:
   IsCameraPositionTopBounded: 0
   IsCameraPositionBottomBounded: 0
   GameCamera: {fileID: 519420031}
+--- !u!114 &519420034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ac0ec3d6ad5f4a3d9d184bc3773a3a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _pc2D: {fileID: 519420033}
+  _serializedAxis: 0
+  ShakePresets: []
+  ConstantShakePresets: []
+  StartConstantShakePreset: {fileID: 0}
+  CurrentConstantShakePreset: {fileID: 0}
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 844c3d3058dec234297176a91fb78393, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &909480353
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,15 +495,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65429b16121e86040be17db3afd293d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactKey: 101
-  spyKey: 102
-  lightKey: 113
-  mapKey: 109
-  ruleKey: 9
-  runKey: 304
-  upStairKey: 119
-  downStairKey: 115
-  pauseKey: 27
+  InteractKey: 101
+  FKey: 102
+  QKey: 113
+  MapKey: 109
+  TabKey: 9
+  RunKey: 304
+  UpKey: 273
+  DownKey: 274
+  PauseKey: 27
 --- !u!114 &1357557152
 MonoBehaviour:
   m_ObjectHideFlags: 0

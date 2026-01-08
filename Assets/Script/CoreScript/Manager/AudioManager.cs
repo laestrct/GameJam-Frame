@@ -169,6 +169,88 @@ public class AudioManager : MonoSingleton<AudioManager>
 
     #endregion
 
+    #region 3D Effect Control (空间音效)
+
+    /// <summary>
+    /// 在指定位置播放3D音效
+    /// </summary>
+    /// <param name="name">音效文件名</param>
+    /// <param name="position">世界坐标</param>
+    /// <param name="prefab">【可选】包含AudioSource配置的预制体。如果为null，将代码生成一个默认3D源。</param>
+    /// <param name="volumeScale">音量</param>
+    public void PlayEffectAt(string name, Vector3 position, GameObject prefab = null, float volumeScale = 1f)
+    {
+        if (IsEffectMuted) return;
+        var clip = LoadClip(name, false);
+        if (clip == null) return;
+
+        CreateAndPlay3DSource(clip, position, null, prefab, volumeScale);
+    }
+
+    /// <summary>
+    /// 在指定物体上播放3D音效（跟随移动）
+    /// </summary>
+    /// <param name="name">音效文件名</param>
+    /// <param name="target">跟随的目标Transform</param>
+    /// <param name="prefab">【可选】预制体</param>
+    /// <param name="volumeScale">音量</param>
+    public void PlayEffectFollow(string name, Transform target, GameObject prefab = null, float volumeScale = 1f)
+    {
+        if (IsEffectMuted) return;
+        var clip = LoadClip(name, false);
+        if (clip == null) return;
+
+        CreateAndPlay3DSource(clip, target.position, target, prefab, volumeScale);
+    }
+
+    /// <summary>
+    /// 创建临时的3D音效对象
+    /// </summary>
+    private void CreateAndPlay3DSource(AudioClip clip, Vector3 pos, Transform parent, GameObject prefab, float volume)
+    {
+        GameObject audioObj;
+        AudioSource source;
+
+        if (prefab != null)
+        {
+            audioObj = Instantiate(prefab, pos, Quaternion.identity);
+            source = audioObj.GetComponent<AudioSource>();
+            if (source == null)
+            {
+                Debug.LogWarning($"[AudioManager] 传入的 Prefab '{prefab.name}' 缺少 AudioSource 组件，已自动添加。");
+                source = audioObj.AddComponent<AudioSource>();
+            }
+        }
+        else
+        {
+            audioObj = new GameObject($"TempSFX_{clip.name}");
+            audioObj.transform.position = pos;
+            source = audioObj.AddComponent<AudioSource>();
+
+            // 默认3D设置 (如果没传prefab)
+            source.spatialBlend = 1.0f; // 1.0是完全3D，0.0是2D
+            source.minDistance = 2f;    // 最小衰减距离
+            source.maxDistance = 20f;   // 最大听到距离
+            source.rolloffMode = AudioRolloffMode.Logarithmic; // 对数衰减
+        }
+
+        if (parent != null)
+        {
+            audioObj.transform.SetParent(parent);
+            audioObj.transform.localPosition = Vector3.zero; // 归零，位于父物体中心
+        }
+
+        source.clip = clip;
+        source.volume = volume;
+        source.outputAudioMixerGroup = effectMixerGroup; // 别忘了应用Mixer
+        source.Play();
+
+        //  (Clip时长 + 0.1秒缓冲)
+        Destroy(audioObj, clip.length + 0.1f);
+    }
+
+    #endregion
+
     #region Resource Management
 
     // 统一资源加载与缓存逻辑
