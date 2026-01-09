@@ -12,7 +12,7 @@ public class MenuState : GameState
 
     public override void OnUpdate()
     {
-        if (InputManager.Instance.Esc()) // 假设空格开始
+        if (InputManager.Instance.Esc()) 
         {
             //manager.ChangeState(new GameplayState(manager));
         }

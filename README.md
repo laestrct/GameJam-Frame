@@ -174,6 +174,39 @@ timer.Cancel();
 Timer.Register(5f, () => {}, isLooped: true).SetTag("Level1");
 Timer.CancelAll("Level1");
 ```
+
+### 8. Data Manager (数据管理)
+基于 **BindableProperty** 的响应式数据系统。修改数据 **自动广播** 全局事件，无需手动 Invoke。
+
+* **特性**：
+    * **自动广播**：只要修改 `.Value`，系统检测到值变化即自动发送 `GameEvent.DataChange`。
+    * **隐式转换**：`float hp = GameData.PlayerHp` 可直接读取，语法自然。
+    * **反射注入**：利用反射自动将变量名（如 "Score"）绑定为事件参数，严格遵循约定优于配置。
+
+```csharp
+// 定义数据 (GameData.cs)
+public class GameData
+{
+    // 使用 BindableProperty 包装基础类型
+    public BindableProperty<int> Score { get; } = new(0);
+    public BindableProperty<float> PlayerHp { get; } = new(100.0f);
+}
+
+// 修改数据 (任何地方)
+// 这行代码会自动触发 Broadcast(GameEvent.DataChange, "Score");
+DataManager.Instance.GameData.Score.Value += 10;
+
+// 监听数据变化 (UI层)
+void Awake() {
+    EventCenter.AddListener<string>(GameEvent.DataChange, OnDataChange);
+}
+
+void OnDataChange(string name) {
+    if (name == "Score") UpdateScoreUI();
+    if (name == "PlayerHp") UpdateHpBar();
+}
+```
+
 ---
 
 ## 🚀 快速开始

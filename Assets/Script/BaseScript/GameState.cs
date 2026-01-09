@@ -3,13 +3,10 @@
 /// </summary>
 public abstract class GameState
 {
-    protected GameManager manager;
-
-    // 构造函数注入Manager引用，方便访问全局数据
-    public GameState()
-    {
-        this.manager = GameManager.Instance;
-    }
+    //便于替换，非必要使用
+    protected GameManager GameManager=>GameManager.Instance;
+    protected UIManager UIManager=>UIManager.Instance;
+    protected AudioManager AudioManager=>AudioManager.Instance;
 
     /// <summary>
     /// 进入状态时调用一次 (初始化UI，重置参数)

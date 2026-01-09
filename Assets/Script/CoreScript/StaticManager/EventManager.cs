@@ -262,5 +262,9 @@ public enum GameEvent
     // UI相关
     ShowSettlementPanel,
     InputDeviceChanged, //手柄控制切换
+
+
+    //Data相关
+    DataChange,
 }
 
