@@ -99,6 +99,7 @@ public class UIManager : MonoSingleton<UIManager>
     }
 
     #endregion
+
     #region 通用方法 
 
     /// <summary>
@@ -127,7 +128,6 @@ public class UIManager : MonoSingleton<UIManager>
     }
 
     #endregion
-
 
     #region 全屏 UI (互斥，同时只有一个)
 
@@ -219,8 +219,7 @@ public class UIManager : MonoSingleton<UIManager>
     {
         while (panelList.Count > 0)
         {
-            var ui = panelList[^1];
-            ui.OnClose();
+            ClosePanel(panelList[^1]);
         }
     }
 
