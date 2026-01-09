@@ -117,6 +117,16 @@ public static class EventManager
         }
     }
 
+    /// <summary>
+    /// 移除指定事件上的所有监听
+    /// <para>通常用于关卡切换或重置时，强制清理某个特定事件，防止残留引用。</para>
+    /// </summary>
+    public static void RemoveAllListeners(GameEvent evt)
+    {
+            //该事件下挂载的所有委托都会被 GC 回收
+            EventTable.Remove(evt);
+    }
+
     #endregion
 
     #region 广播事件 (Broadcast)

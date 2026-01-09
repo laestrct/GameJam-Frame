@@ -7,7 +7,6 @@ public class MenuState : GameState
         Time.timeScale = 0f;
 
         // UIManager.Instance.PushPanel<MainMenuPanel>(); 
-        UIManager.Instance.Open<StartUI>();
         Debug.Log("UI: 显示开始按钮");
     }
 

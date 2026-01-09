@@ -34,10 +34,13 @@ AudioManager.Instance.PlayEffectRandom("Footstep");
 
 ```csharp
 // 打开面板 (入栈)
-UIManager.Instance.OpenPanel<InventoryPanel>();
+var ui = UIManager.Instance.Open<InventoryPanel>();
+
+//打开弹窗
+var ui1 = UIManager.Instance.OpenPopup<PopUI>();
 
 // 打开全屏窗口 (与其他全屏互斥)
-UIManager.Instance.OpenFullScreen<GamePlayPanel>();
+var ui2 = UIManager.Instance.OpenFullScreen<GamePlayPanel>();
 
 // 在 UI 脚本内部关闭自己
 public void OnCloseBtnClick()
@@ -46,7 +49,7 @@ public void OnCloseBtnClick()
 }
 
 // 外部强制关闭指定 UI
-UIManager.Instance.CloseUI<InventoryPanel>();
+UIManager.Instance.CloseUI(ui);
 ```
 
 ### 3. Input Manager (输入管理)
@@ -75,12 +78,14 @@ string tip = InputManager.Instance.ParseInputString("请按 [Interact] 进行互
 基于 `Enum` 的静态即时消息中心，**解耦** Gameplay 与 UI/Audio。
 
 * **特性**：
-    * **类型安全**：强制使用 `GameEvent` 枚举，彻底避免字符串拼写错误。
+    * **类型安全**：强制使用 `GameEvent` 枚举。
     * **静态访问**：无需获取 Instance，任何地方均可调用。
     * **泛型支持**：支持无参、1参、2参传递。
+    
+> *注：事件监听后一定要记得取消订阅，通常不应该在事件位置使用匿名函数。*
 
 ```csharp
-// 定义事件
+// 定义事件(在EventManager脚本中)
 public enum GameEvent { PlayerDead, ScoreChange }
 
 // 发送事件
@@ -91,6 +96,7 @@ EventCenter.AddListener<int>(GameEvent.ScoreChange, OnScoreChange);
 
 // 移除监听 (有监听务必移除监听)
 EventCenter.RemoveListener<int>(GameEvent.ScoreChange, OnScoreChange);
+EventCenter.RemoveAllListeners(GameEvent.ScoreChange);
 ```
 
 ### 5. Game Manager (状态机)
@@ -103,7 +109,7 @@ EventCenter.RemoveListener<int>(GameEvent.ScoreChange, OnScoreChange);
 
 ```csharp
 // 切换状态
-GameManager.Instance.ChangeState(new GameplayState(GameManager.Instance));
+GameManager.Instance.ChangeState(new GameplayState());
 
 // 在 State 类内部
 public override void OnEnter()
