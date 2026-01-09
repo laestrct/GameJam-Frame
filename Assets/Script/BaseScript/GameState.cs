@@ -6,9 +6,9 @@ public abstract class GameState
     protected GameManager manager;
 
     // 构造函数注入Manager引用，方便访问全局数据
-    public GameState(GameManager manager)
+    public GameState()
     {
-        this.manager = manager;
+        this.manager = GameManager.Instance;
     }
 
     /// <summary>

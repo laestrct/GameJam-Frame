@@ -44,7 +44,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         DontDestroyOnLoad(gameObject);
         // 初始化时进入菜单状态
-        ChangeState(new MenuState(this));
+        ChangeState(new MenuState());
     }
     public void Update()
     {
