@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
@@ -8,16 +9,15 @@ using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
     #region FSM (状态机核心)
-
+    [ShowInInspector]
+    [SerializeReference]
+    public GameState SelectedState;
     private GameState currentState;
 
     // 状态切换方法
     public void ChangeState(GameState newState)
     {
-        if (currentState != null)
-        {
-            currentState.OnExit();
-        }
+        currentState?.OnExit();
 
         currentState = newState;
 
@@ -28,8 +28,6 @@ public class GameManager : MonoSingleton<GameManager>
         }
     }
 
-
-
     #endregion
 
     #region 快速引用
@@ -38,17 +36,17 @@ public class GameManager : MonoSingleton<GameManager>
 
     #endregion
 
+
     #region 生命周期
 
-    public void Awake()
+    //之后需要将Manager的Init逻辑全部集中到这里来
+    public void Start()
     {
-        DontDestroyOnLoad(gameObject);
-        // 初始化时进入菜单状态
-        ChangeState(new MenuState());
+        ChangeState(SelectedState);
     }
+
     public void Update()
     {
-        // 将Update驱动权下放给当前状态
         currentState?.OnUpdate();
     }
 
@@ -58,15 +56,38 @@ public class GameManager : MonoSingleton<GameManager>
     //此处为示例方法，可根据需要自行添加
     //全局辅助方法应在此处添加
 
-    public void RegisterPlayer(GameObject player)
+    /// <summary>
+    /// 游戏的开始(new)
+    /// </summary>
+    public void GameStart()
     {
-        this.Player = player;
+        Time.timeScale = 1;
     }
 
-    public void UnregisterPlayer()
+    /// <summary>
+    /// 游戏暂停
+    /// </summary>
+    public void GamePause()
     {
-        this.Player = null;
+        Time.timeScale = 0;
     }
+
+    public void GameContinue()
+    {
+        Time.timeScale = 1;
+    }
+
+    public void GameOver()
+    {
+    }
+
+    /// <summary>
+    /// 游戏胜利
+    /// </summary>
+    public void GameWin()
+    {
+    }
+
 
     #endregion
 }

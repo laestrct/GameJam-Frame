@@ -170,7 +170,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
 --- !u!114 &302783391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,6 +543,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc538099b6d30104a9ec72c833b8bc47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SelectedState:
+    rid: 2994772055466704896
+  references:
+    version: 2
+    RefIds:
+    - rid: 2994772055466704896
+      type: {class: MenuState, ns: , asm: Assembly-CSharp}
+      data: 
 --- !u!4 &1357557155
 Transform:
   m_ObjectHideFlags: 0

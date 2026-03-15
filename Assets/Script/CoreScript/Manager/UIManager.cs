@@ -30,6 +30,56 @@ public class UIManager : MonoSingleton<UIManager>
         InitUIStructure();
     }
 
+    #region 查询方法
+
+    /// <summary>
+    /// 获取指定类型的 UI 实例
+    /// 查找顺序：全屏UI -> 面板栈 (栈顶优先) -> 弹窗层
+    /// </summary>
+    /// <typeparam name="T">具体的 UIBase 子类</typeparam>
+    /// <returns>找到的实例，未找到返回 null</returns>
+    public T GetUI<T>() where T : UIBase
+    {
+        // 1. 检查当前全屏 UI
+        if (currentFullScreenUI is T fullScreenUI)
+        {
+            return fullScreenUI;
+        }
+
+        // 2. 检查面板列表
+        // 倒序遍历，优先返回栈顶（当前显示）的面板
+        for (var i = panelList.Count - 1; i >= 0; i--)
+        {
+            if (panelList[i] is T panel)
+            {
+                return panel;
+            }
+        }
+
+        // 3. 检查弹窗层
+        // 由于 OpenPopup 中没有将弹窗加入 List 管理，必须去 Transform 层级查找
+        // includeInactive: true 确保即使 UI 处于非激活状态（如被对象池回收或隐藏）也能找到
+        var popup = layerPopup.GetComponentInChildren<T>(true);
+        if (popup != null)
+        {
+            return popup;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 尝试获取 UI，如果存在则执行操作
+    /// </summary>
+    public bool TryGetUI<T>(out T uiInstance) where T : UIBase
+    {
+        uiInstance = GetUI<T>();
+        return uiInstance != null;
+    }
+
+    #endregion
+
+
     /// <summary>
     /// 自动初始化Canvas结构
     /// </summary>
@@ -114,14 +164,14 @@ public class UIManager : MonoSingleton<UIManager>
         if (panelList.Contains(ui))
         {
             ClosePanel(ui);
-            return; 
+            return;
         }
 
         if (currentFullScreenUI == ui)
         {
             currentFullScreenUI = null;
-            ui.OnClose(); 
-            return; 
+            ui.OnClose();
+            return;
         }
 
         ui.OnClose();
@@ -131,7 +181,7 @@ public class UIManager : MonoSingleton<UIManager>
 
     #region 全屏 UI (互斥，同时只有一个)
 
-    public T OpenFullScreen<T>(object args=null) where T : UIBase
+    public T OpenFullScreen<T>(object args = null) where T : UIBase
     {
         //如果有旧的，关掉
         if (currentFullScreenUI != null)

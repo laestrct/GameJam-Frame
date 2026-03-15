@@ -44,7 +44,7 @@ public class BindableProperty<T> : IBindable
                 // 自动广播 DataChange 事件，参数是变量名
                 if (!string.IsNullOrEmpty(_name))
                 {
-                    EventManager.Broadcast(GameEvent.DataChange, _name);
+                    EventManager.Broadcast<DataChangeEvent>(new DataChangeEvent(_name));
                 }
             }
         }
