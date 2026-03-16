@@ -24,6 +24,7 @@ public class UIManager : MonoSingleton<UIManager>
     // 状态存储
     private UIBase currentFullScreenUI;
     private List<UIBase> panelList = new();
+    private Dictionary<string, GameObject> prefabCache = new();
 
     public void Awake()
     {
@@ -132,11 +133,15 @@ public class UIManager : MonoSingleton<UIManager>
     private T LoadUI<T>(Transform parent) where T : UIBase
     {
         string uiName = typeof(T).Name;
-        var prefab = Resources.Load<GameObject>(UI_PREFAB_PATH + uiName);
-        if (prefab == null)
+        if (!prefabCache.TryGetValue(uiName, out var prefab))
         {
-            Debug.LogError($"[UIManager] 找不到Prefab: {UI_PREFAB_PATH}{uiName}");
-            return null;
+            prefab = Resources.Load<GameObject>(UI_PREFAB_PATH + uiName);
+            if (prefab == null)
+            {
+                Debug.LogError($"[UIManager] 找不到Prefab: {UI_PREFAB_PATH}{uiName}");
+                return null;
+            }
+            prefabCache[uiName] = prefab;
         }
 
         var obj = Instantiate(prefab, parent);
